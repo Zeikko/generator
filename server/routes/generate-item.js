@@ -1,30 +1,33 @@
 import _ from 'lodash'
-import { getData } from '../read-spreadsheet'
+import { readSpreadsheet } from '../read-spreadsheet'
+import { replace } from '../generate-string'
 
-let data
+let data = {}
 
-export function generateItem(req, res) {
-  data = getData()
-  res.json(replace({
-    name: 'phrase'
-  }))
+function getData() {
+  return data
+} 
+
+function update() {
+  readSpreadsheet('https://docs.google.com/spreadsheets/d/1U4X7xTTVl0JfF0pwFlxdtuQB5oj90n9VZNOc_lAU4JI/pub?gid=0&single=true&output=csv').then(csv => {
+    data = _.chain(csv)
+      .groupBy('name')
+      .mapValues(arr => _.first(arr))
+      .mapValues(item => {
+        item.children = item.children.length ? item.children.split(',') : null
+        return item
+      })
+      .value()
+  })
 }
 
-function replace(obj) {
-  const newObj = _.clone(obj)
-  newObj.name = _.map(obj.name.split(' '), namePart => {
-    if(_.get(data, namePart + '.children')) {
-      const match = _.chain(data[namePart].children)
-        .shuffle()
-        .first()
-        .value()
-      namePart = _.get(match, 'name', match) //Can be removed when data includes only objects
-    }
-    return namePart
-  }).join(' ')
-  if(newObj.name === obj.name) {
-    return newObj
-  } else {
-    return replace(newObj)
-  }
+update()
+
+setInterval(update, 60 * 1000)
+
+export function getItem(req, res) {
+  data = getData()
+  res.json(replace(data, {
+    string: 'phrase'
+  }))
 }

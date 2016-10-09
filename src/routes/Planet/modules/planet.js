@@ -4,18 +4,19 @@ import _ from 'lodash'
 // ------------------------------------
 // Constants
 // ------------------------------------
-export const GENERATE_ITEM = 'GENERATE_ITEM'
+export const GENERATE_PLANET = 'GENERATE_PLANET'
 
 // ------------------------------------
 // Actions
 // ------------------------------------
 
-export function generateItem() {
+export function generatePlanet() {
   return (dispatch, getState) => {
-    return axios.get('/api/item', )
+    return axios.get('/api/planet', {
+      })
       .then(function (response) {
         return dispatch({
-          type: GENERATE_ITEM,
+          type: GENERATE_PLANET,
           payload: response.data
         })
       })
@@ -23,14 +24,14 @@ export function generateItem() {
 }
 
 export const actions = {
-  generateItem
+  generatePlanet
 }
 
 // ------------------------------------
 // Action Handlers
 // ------------------------------------
 const ACTION_HANDLERS = {
-  [GENERATE_ITEM]: (state, action) => {
+  [GENERATE_PLANET]: (state, action) => {
     return {
       ...state,
       result: action.payload

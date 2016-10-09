@@ -2,9 +2,9 @@ import axios from 'axios'
 import parse from 'csv-parse/lib/sync'
 import _ from 'lodash'
 
-let data = {}
+let datas = {}
 
-function readSpreadsheet(url) {
+export function readSpreadsheet(url) {
   return axios.get(url)
     .then(function (response) {
       return parse(response.data, {
@@ -16,23 +16,29 @@ function readSpreadsheet(url) {
     });
 }
 
-export function getData() {
-  return data
+export function getData(url) {
+  if(_.get(datas, url)) {
+    return Promise.resolve(datas[url])
+  } else {
+    return updateOne(url)
+  }
 } 
 
-function update() {
-  readSpreadsheet('https://docs.google.com/spreadsheets/d/1U4X7xTTVl0JfF0pwFlxdtuQB5oj90n9VZNOc_lAU4JI/pub?gid=0&single=true&output=csv').then(csv => {
-    data = _.chain(csv)
-      .groupBy('name')
-      .mapValues(arr => _.first(arr))
-      .mapValues(item => {
-        item.children = item.children.length ? item.children.split(',') : null
-        return item
+function updateAll() {
+  _.forEach(datas, (data, url) => updateOne(url))
+}
+
+function updateOne(url) {
+  return readSpreadsheet(url).then(csv => {
+    const data = _.chain(csv)
+      .map(row => {
+        return _.mapValues(row, cell => cell.length === 0 ? null : cell)
       })
+      .groupBy('parent')
       .value()
+      datas[url] = data
+    return data
   })
 }
 
-update()
-
-setInterval(update, 60 * 1000)
+setInterval(updateAll, 60 * 1000)
