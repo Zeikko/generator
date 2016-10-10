@@ -6,6 +6,7 @@ import { generateTerrain } from './generate-terrain'
 import { generateSize } from './generate-size'
 import { generateTemperature } from './generate-temperature'
 import { generateBiosphere } from './generate-biosphere'
+import { generatePopulation } from './generate-population'
 
 export function getPlanet(req, res) {
   const planet = {
@@ -26,6 +27,10 @@ export function getPlanet(req, res) {
   .then(terrain => {
     planet.terrain = terrain
     return generateBiosphere(getFeatureModifier(planet, 'biosphere'))
+  })
+  .then(population => {
+    planet.population = population
+    return generatePopulation(getFeatureModifier(planet, 'population'))
   })
   .then(biosphere => {
     planet.biosphere = biosphere
