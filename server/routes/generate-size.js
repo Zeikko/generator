@@ -10,10 +10,10 @@ export function getSize(req, res) {
   })
 }
 
-export function generateSize(modifier) {
+export function generateSize(string, modifier) {
   return getData('https://docs.google.com/spreadsheets/d/1BiYtAIP7jJAv-SghwAziSKPYacGY7iCx0Srrwm4tViQ/pub?gid=0&single=true&output=csv').then(data => {
     return replaceMarked(data, {
-      string: '%size%',
+      string,
       features: [],
       modifier
     })

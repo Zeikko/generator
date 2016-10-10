@@ -10,10 +10,10 @@ export function getTemperature(req, res) {
   })
 }
 
-export function generateTemperature(modifier) {
+export function generateTemperature(string, modifier) {
   return getData('https://docs.google.com/spreadsheets/d/1YsGusJ-x4HBogC7uCWtGMs6-v3hHqpdQ6cx_Xmig_6A/pub?gid=0&single=true&output=csv').then(data => {
     return replaceMarked(data, {
-      string: '%temperature%',
+      string,
       features: [],
       modifier
     })

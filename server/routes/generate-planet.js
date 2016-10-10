@@ -7,44 +7,44 @@ import { generateSize } from './generate-size'
 import { generateTemperature } from './generate-temperature'
 import { generateBiosphere } from './generate-biosphere'
 import { generatePopulation } from './generate-population'
+import { generateTechnology } from './generate-technology'
 
 export function getPlanet(req, res) {
   const planet = {
     name: generatePlanetName()
   }
-  generateSize(_.random(-1, 1)).then(size => {
+  generateSize('%size%', _.random(-1, 1)).then(size => {
     planet.size = size
-    return generateAtmosphere(getFeatureModifier(planet, 'atmosphere'))
+    return generateAtmosphere(size.string, getFeatureModifier(planet, 'atmosphere'))
   })
   .then(atmosphere => {
     planet.atmosphere = atmosphere
-    return generateTemperature(getFeatureModifier(planet, 'temperature'))
+    return generateTemperature(atmosphere.string, getFeatureModifier(planet, 'temperature'))
   })
   .then(temperature => {
     planet.temperature = temperature
-    return generateTerrain(getFeatureModifier(planet, 'terrain'))
+    return generateTerrain(temperature.string, getFeatureModifier(planet, 'terrain'))
   })
   .then(terrain => {
     planet.terrain = terrain
-    return generateBiosphere(getFeatureModifier(planet, 'biosphere'))
-  })
-  .then(population => {
-    planet.population = population
-    return generatePopulation(getFeatureModifier(planet, 'population'))
+    return generateBiosphere(terrain.string, getFeatureModifier(planet, 'biosphere'))
   })
   .then(biosphere => {
     planet.biosphere = biosphere
-    planet.description = combineDescriptions(planet)
+    return generatePopulation(biosphere.string, getFeatureModifier(planet, 'population'))
+  })
+  .then(population => {
+    planet.population = population
+    return generateTechnology(population.string, getFeatureModifier(planet, 'technology'))
+  })
+  .then(technology => {
+    planet.technology = technology
+    planet.description = fixGrammar(technology.string)
     res.json(planet)
   })
 }
 
 
-function combineDescriptions(planet) {
-  const attributes = _.chain(planet)
-    .mapValues(attribute => _.get(attribute, 'string', null))
-    .filter(attribute => attribute)
-    .map(string => string.replace(/\b(a) ([eyuioa])/g, 'an $1'))
-    .value()
-  return attributes.join(' ')
+function fixGrammar(string) {
+  return string.replace(/\b(a) ([eyuioa])/g, 'an $1')
 }

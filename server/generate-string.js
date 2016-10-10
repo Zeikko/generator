@@ -23,10 +23,10 @@ export function replaceMarked(data, obj) {
   const newObj = _.clone(obj)
   const random = _.random(-1,1)
   newObj.string = obj.string.replace(/%(.*?)%/g, stringPart => {
-    stringPart = stringPart.replace(/%/g, '')
-    if(_.get(data, stringPart)) {
+    let replacedStringPart = stringPart.replace(/%/g, '')
+    if(_.get(data, replacedStringPart)) {
       
-      const match = _.chain(data[stringPart])
+      const match = _.chain(data[replacedStringPart])
         .map(row => {
           row.distance = 0
           row.random = random
@@ -40,8 +40,9 @@ export function replaceMarked(data, obj) {
         .orderBy(['distance'], ['asc'])
         .first()
         .value()
-      stringPart = _.get(match, 'string', match)
+      replacedStringPart = _.get(match, 'string', match)
       newObj.features.push(match)
+      return replacedStringPart
     }
     return stringPart
   })

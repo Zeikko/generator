@@ -10,10 +10,10 @@ export function getTerrain(req, res) {
   })
 }
 
-export function generateTerrain(modifier) {
+export function generateTerrain(string, modifier) {
   return getData('https://docs.google.com/spreadsheets/d/12NUonkE6QHBVlNEuXXQMVLg_33pFsnROQlhsEEFBm8M/pub?gid=0&single=true&output=csv').then(data => {
     return replaceMarked(data, {
-      string: '%terrain%',
+      string,
       features: [],
       modifier
     })

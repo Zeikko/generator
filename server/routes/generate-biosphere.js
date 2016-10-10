@@ -10,10 +10,10 @@ export function getBiosphere(req, res) {
   })
 }
 
-export function generateBiosphere(modifier) {
+export function generateBiosphere(string, modifier) {
   return getData('https://docs.google.com/spreadsheets/d/1Dx9FNFjTlr--zjInY17RPx-BiC0kRIps8IgrzO9xsmE/pub?gid=0&single=true&output=csv').then(data => {
     return replaceMarked(data, {
-      string: '%biosphere%',
+      string,
       features: [],
       modifier
     })
